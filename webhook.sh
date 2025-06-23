@@ -4,23 +4,34 @@
 BIN_PATH=".venv/bin/gunicorn -w 4 -b 0.0.0.0:5001 main:app"
 PID_FILE="gunicorn.pid"
 VENV_PATH=".venv/bin/activate"
+LOG_FILE="logs/event.log"
 
 # 실행 함수
 start() {
     if [ -f "$PID_FILE" ]; then
-        echo "Error: gunicorn is already running with PID $(cat $PID_FILE)."
+        MSG="Error: gunicorn is already running with PID $(cat $PID_FILE)."
+        echo "$MSG"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') INFO $MSG" >> "$LOG_FILE"
     else
         if [ -f "$VENV_PATH" ]; then
-            echo "Activating venv..."
+            MSG="Activating venv..."
+            echo "$MSG"
+            echo "$(date '+%Y-%m-%d %H:%M:%S') INFO $MSG" >> "$LOG_FILE"
             source $VENV_PATH
         else
-            echo "Error: $VENV_PATH not found."
+            MSG="Error: $VENV_PATH not found."
+            echo "$MSG"
+            echo "$(date '+%Y-%m-%d %H:%M:%S') ERROR $MSG" >> "$LOG_FILE"
             exit 1
         fi
-        echo "Starting gunicorn..."
+        MSG="Starting gunicorn..."
+        echo "$MSG"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') INFO $MSG" >> "$LOG_FILE"
         nohup $BIN_PATH &> /dev/null &
         echo $! > $PID_FILE
-        echo "gunicorn started with PID $(cat $PID_FILE)."
+        MSG="gunicorn started with PID $(cat $PID_FILE)."
+        echo "$MSG"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') INFO $MSG" >> "$LOG_FILE"
     fi
 }
 
