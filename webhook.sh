@@ -3,12 +3,20 @@
 # 설정
 BIN_PATH="gunicorn -w 4 -b 0.0.0.0:5001 main:app"
 PID_FILE="gunicorn.pid"
+VENV_PATH=".venv/bin/activate"
 
 # 실행 함수
 start() {
     if [ -f "$PID_FILE" ]; then
         echo "Error: gunicorn is already running with PID $(cat $PID_FILE)."
     else
+        if [ -f "$VENV_PATH" ]; then
+            echo "Activating venv..."
+            source $VENV_PATH
+        else
+            echo "Error: $VENV_PATH not found."
+            exit 1
+        fi
         echo "Starting gunicorn..."
         nohup $BIN_PATH &> /dev/null &
         echo $! > $PID_FILE
@@ -40,6 +48,9 @@ stop() {
             kill $PID
             rm -f $PID_FILE
             echo "gunicorn stopped."
+            if type deactivate 2>/dev/null; then
+                deactivate
+            fi
         else
             echo "Error: gunicorn is not running."
             rm -f $PID_FILE
