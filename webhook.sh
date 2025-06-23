@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 설정
-BIN_PATH="gunicorn -w 4 -b 0.0.0.0:5001 main:app"
+BIN_PATH=".venv/bin/gunicorn -w 4 -b 0.0.0.0:5001 main:app"
 PID_FILE="gunicorn.pid"
 VENV_PATH=".venv/bin/activate"
 

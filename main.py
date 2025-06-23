@@ -33,6 +33,18 @@ handler.setFormatter(formatter)
 logging.getLogger().handlers = [handler]
 logging.getLogger().setLevel(logging.INFO)
 
+# 최초 실행 시 DB 접속 테스트 및 로그 기록
+try:
+    test_conn = oracledb.connect(
+        user="",  # 실제 운영 계정 정보 입력 필요
+        password="",
+        dsn=oracledb.makedsn("158.247.242.124", 1521, sid="ORA")
+    )
+    test_conn.close()
+    logging.info("[STARTUP] Oracle DB connection test: SUCCESS")
+except Exception as e:
+    logging.error(f"[STARTUP] Oracle DB connection test: FAILED - {e}")
+    sys.exit(1)
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
