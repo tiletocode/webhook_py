@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 import oracledb
 import logging
 import requests
-from datetime import datetime
 from logging.handlers import TimedRotatingFileHandler
 import glob
 import os
@@ -71,7 +70,7 @@ def webhook():
         INSERT INTO EM_TRAN (
             TRAN_PR, TRAN_PHONE, TRAN_CALLBACK, TRAN_STATUS, TRAN_DATE, TRAN_MSG, TRAN_TYPE
         ) VALUES (
-            em_tran_pr.nextval, :TRAN_PHONE, :TRAN_CALLBACK, :TRAN_STATUS, :TRAN_DATE, :TRAN_MSG, :TRAN_TYPE
+            em_tran_pr.nextval, :TRAN_PHONE, :TRAN_CALLBACK, :TRAN_STATUS, SYSDATE, :TRAN_MSG, :TRAN_TYPE
         )
         """
 
@@ -80,10 +79,10 @@ def webhook():
                 "TRAN_PHONE": phone,
                 "TRAN_CALLBACK": "15882323",
                 "TRAN_STATUS": "1",
-                "TRAN_DATE": datetime.now(),
                 "TRAN_MSG": data.get("message"),
                 "TRAN_TYPE": 4
             })
+            logging.info(f"DB INSERT SUCCESS: TRAN_PHONE={phone}")
 
         conn.commit()
         return jsonify({'status': 'success', 'inserted': len(phone_numbers)}), 200
@@ -115,5 +114,8 @@ atexit.register(on_exit)
 signal.signal(signal.SIGTERM, handle_sigterm)
 signal.signal(signal.SIGINT, handle_sigterm)
 
+# __main__ 블록은 gunicorn 실행 시 필요 없음. 개발용
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
+    app.run(host='0.0.0.0', port=5001, debug=False)
+
+# gunicorn -w 4 -b 0.0.0.0:5001 main:app
