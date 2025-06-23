@@ -1,18 +1,18 @@
 #!/bin/bash
 
 # 설정
-BIN_PATH="python main.py"
-PID_FILE="main.pid"
+BIN_PATH="gunicorn -w 4 -b 0.0.0.0:5001 main:app"
+PID_FILE="gunicorn.pid"
 
 # 실행 함수
 start() {
     if [ -f "$PID_FILE" ]; then
-        echo "Error: main.bin is already running with PID $(cat $PID_FILE)."
+        echo "Error: gunicorn is already running with PID $(cat $PID_FILE)."
     else
-        echo "Starting main.bin..."
+        echo "Starting gunicorn..."
         nohup $BIN_PATH &> /dev/null &
         echo $! > $PID_FILE
-        echo "main.bin started with PID $(cat $PID_FILE)."
+        echo "gunicorn started with PID $(cat $PID_FILE)."
     fi
 }
 
@@ -21,13 +21,13 @@ status() {
     if [ -f "$PID_FILE" ]; then
         PID=$(cat $PID_FILE)
         if ps -p $PID > /dev/null; then
-            echo "main.bin is running with PID $PID."
+            echo "gunicorn is running with PID $PID."
         else
-            echo "Error: main.bin is not running but PID file exists."
+            echo "Error: gunicorn is not running but PID file exists."
             rm -f $PID_FILE
         fi
     else
-        echo "main.bin is not running."
+        echo "gunicorn is not running."
     fi
 }
 
@@ -36,16 +36,16 @@ stop() {
     if [ -f "$PID_FILE" ]; then
         PID=$(cat $PID_FILE)
         if ps -p $PID > /dev/null; then
-            echo "Stopping main.bin with PID $PID..."
+            echo "Stopping gunicorn with PID $PID..."
             kill $PID
             rm -f $PID_FILE
-            echo "main.bin stopped."
+            echo "gunicorn stopped."
         else
-            echo "Error: main.bin is not running."
+            echo "Error: gunicorn is not running."
             rm -f $PID_FILE
         fi
     else
-        echo "Error: No PID file found. main.bin might not be running."
+        echo "Error: No PID file found. gunicorn might not be running."
     fi
 }
 
