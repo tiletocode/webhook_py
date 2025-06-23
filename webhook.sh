@@ -11,27 +11,27 @@ start() {
     if [ -f "$PID_FILE" ]; then
         MSG="Error: gunicorn is already running with PID $(cat $PID_FILE)."
         echo "$MSG"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') INFO $MSG" >> "$LOG_FILE"
+        echo "$(date '+%Y-%m-%d %H:%M:%S,%3N') INFO $MSG" >> "$LOG_FILE"
     else
         if [ -f "$VENV_PATH" ]; then
             MSG="Activating venv..."
             echo "$MSG"
-            echo "$(date '+%Y-%m-%d %H:%M:%S') INFO $MSG" >> "$LOG_FILE"
+            echo "$(date '+%Y-%m-%d %H:%M:%S,%3N') INFO $MSG" >> "$LOG_FILE"
             source $VENV_PATH
         else
             MSG="Error: $VENV_PATH not found."
             echo "$MSG"
-            echo "$(date '+%Y-%m-%d %H:%M:%S') ERROR $MSG" >> "$LOG_FILE"
+            echo "$(date '+%Y-%m-%d %H:%M:%S,%3N') ERROR $MSG" >> "$LOG_FILE"
             exit 1
         fi
         MSG="Starting gunicorn..."
         echo "$MSG"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') INFO $MSG" >> "$LOG_FILE"
+        echo "$(date '+%Y-%m-%d %H:%M:%S,%3N') INFO $MSG" >> "$LOG_FILE"
         nohup $BIN_PATH &> /dev/null &
         echo $! > $PID_FILE
         MSG="gunicorn started with PID $(cat $PID_FILE)."
         echo "$MSG"
-        echo "$(date '+%Y-%m-%d %H:%M:%S') INFO $MSG" >> "$LOG_FILE"
+        echo "$(date '+%Y-%m-%d %H:%M:%S,%3N') INFO $MSG" >> "$LOG_FILE"
     fi
 }
 
