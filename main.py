@@ -61,8 +61,8 @@ def webhook():
         
         # 3. 각 전화번호마다 INSERT
         conn = oracledb.connect(
-          user="whatap",
-          password="whatap!234",
+          user="",
+          password="",
           dsn=oracledb.makedsn("158.247.242.124", 1521, sid="ORA")
         )
         cursor = conn.cursor()
