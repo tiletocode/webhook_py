@@ -153,9 +153,13 @@ def webhook_unified(groupId=None):
                     "TRAN_TYPE": 4
                 }
                 
-                # INSERT 쿼리와 파라미터 로그 기록
-                logging.debug(f"DB INSERT QUERY: {sql.strip()}")
-                logging.debug(f"DB INSERT PARAMS: {params}")
+                # INSERT 쿼리와 파라미터를 결합한 로그 기록
+                query_with_values = f"""INSERT INTO WHATAP.EM_TRAN2 (
+                TRAN_PR, TRAN_PHONE, TRAN_CALLBACK, TRAN_STATUS, TRAN_DATE, TRAN_MSG, TRAN_TYPE
+            ) VALUES (
+                {next_tran_pr}, '{phone_info["phone"]}', '15882323', '1', SYSDATE, '{data.get("message", "")}', 4
+            )"""
+                logging.debug(f"DB INSERT QUERY: {query_with_values.strip()}")
                 
                 cursor.execute(sql, params)
                 logging.info(f"DB INSERT SUCCESS: TRAN_PR={next_tran_pr}, email={phone_info['email']}, TRAN_PHONE={phone_info['phone']}")
