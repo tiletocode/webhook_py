@@ -129,12 +129,12 @@ def webhook_unified(groupId=None):
             # 현재 최대 TRAN_PR 조회
             today_prefix = datetime.now().strftime('%y%m%d')
             default_tran_pr = int(today_prefix + '0000')
-            cursor.execute("SELECT NVL(MAX(TRAN_PR), :default_tran_pr) FROM EM_TRAN2", {'default_tran_pr': default_tran_pr})
+            cursor.execute("SELECT NVL(MAX(TRAN_PR), :default_tran_pr) FROM WHATAP.EM_TRAN2", {'default_tran_pr': default_tran_pr})
             current_max = cursor.fetchone()[0]
             
             # INSERT 쿼리 준비
             sql = """
-            INSERT INTO EM_TRAN2 (
+            INSERT INTO WHATAP.EM_TRAN2 (
                 TRAN_PR, TRAN_PHONE, TRAN_CALLBACK, TRAN_STATUS, TRAN_DATE, TRAN_MSG, TRAN_TYPE
             ) VALUES (
                 :TRAN_PR, :TRAN_PHONE, :TRAN_CALLBACK, :TRAN_STATUS, SYSDATE, :TRAN_MSG, :TRAN_TYPE
@@ -144,14 +144,20 @@ def webhook_unified(groupId=None):
             # 각 전화번호에 대해 INSERT 실행
             for i, phone_info in enumerate(phone_data, start=1):
                 next_tran_pr = current_max + i
-                cursor.execute(sql, {
+                params = {
                     "TRAN_PR": next_tran_pr,
                     "TRAN_PHONE": phone_info["phone"],
                     "TRAN_CALLBACK": "15882323",
                     "TRAN_STATUS": "1",
                     "TRAN_MSG": data.get("message"),
                     "TRAN_TYPE": 4
-                })
+                }
+                
+                # INSERT 쿼리와 파라미터 로그 기록
+                logging.debug(f"DB INSERT QUERY: {sql.strip()}")
+                logging.debug(f"DB INSERT PARAMS: {params}")
+                
+                cursor.execute(sql, params)
                 logging.info(f"DB INSERT SUCCESS: TRAN_PR={next_tran_pr}, email={phone_info['email']}, TRAN_PHONE={phone_info['phone']}")
             
             conn.commit()

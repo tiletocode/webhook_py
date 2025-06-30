@@ -2,3 +2,5 @@
 logs/
 __pycache__/
 *.json
+webhook_py.zip
+main.py
